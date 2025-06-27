@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "915353570557",
+    "project_id": "gemnichat",
+    "storage_bucket": "gemnichat.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915353570557:android:9478da4e84f58bb9cac294",
+        "android_client_info": {
+          "package_name": "com.example.gemnichat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "915353570557-6sj7htuucrm5p9qr1upkk99p726090o7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gemnichat_app",
+            "certificate_hash": "84e17c166064b73c005d907fdef487b452506d1b"
+          }
+        },
+        {
+          "client_id": "915353570557-gfmd5j828n7sn8b6fc3bl1pn7ghaaoj4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxgWo-FDwtuOegPusPLFAlOSSzCxWFs7g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915353570557-gfmd5j828n7sn8b6fc3bl1pn7ghaaoj4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915353570557-fpga292sc3ajokp9dpjbmoa96b8ln87i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gemnichatApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
