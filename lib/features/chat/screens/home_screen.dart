@@ -375,62 +375,81 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (context) {
                         if (user.isFirstTime && selectedChatId == null) {
                           return Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.chat,
-                                  size: 64,
-                                  color: Colors.tealAccent,
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  "Welcome to GemniChat!",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark
-                                            ? Colors.white
-                                            : Colors.black87,
-                                      ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  "Start a conversation with AI or view your recent chats.",
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: isDark
-                                            ? Colors.white70
-                                            : Colors.black54,
-                                      ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 32),
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    myController.clear();
-                                    context.read<ChatBloc>().add(
-                                      StartNewChatEvent(),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.play_arrow),
-                                  label: const Text("Start Chat"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.tealAccent[700],
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 32,
-                                      vertical: 16,
+                            child: Card(
+                              elevation: 6,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              color: isDark ? Colors.grey[900] : Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.chat_bubble_rounded,
+                                      size: 64,
+                                      color: isDark
+                                          ? Colors.tealAccent[200]
+                                          : Colors.teal,
                                     ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
+                                    const SizedBox(height: 20),
+                                    Text(
+                                      "Welcome to GemniChat!",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: isDark
+                                                ? Colors.white
+                                                : Colors.black87,
+                                          ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                  ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      "Start a conversation with AI or view your recent chats.",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? Colors.white70
+                                                : Colors.black54,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 24),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        myController.clear();
+                                        context.read<ChatBloc>().add(
+                                          StartNewChatEvent(),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.play_arrow),
+                                      label: const Text("Start Chat"),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.tealAccent[700],
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 32,
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           );
                         } else {
@@ -467,7 +486,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           }
-
           return const Scaffold(
             body: Center(child: Text("Something went wrong")),
           );
