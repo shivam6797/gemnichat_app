@@ -14,8 +14,7 @@ This app demonstrates:
 - 📦 State management using BLoC pattern
 - 🎨 Responsive and intuitive UI built with Flutter
 - 💾 Shared preferences for local storage
-- 🚫 Proper use of `.gitignore` to avoid committing sensitive files like `.env`
-
+  
 ---
 
 ## 📁 `.env.example` File
