@@ -13,6 +13,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   UserModel? _currentUser;
   String? _currentChatId;
   ChatEvent? _lastChatEvent;
+  bool _isCancelled = false;
 
   ChatBloc({required this.chatRepository}) : super(ChatInitial()) {
     on<FetchUserDetails>(_onFetchUserDetails);
@@ -26,6 +27,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       if (_lastChatEvent != null) {
         add(_lastChatEvent!);
       }
+    });
+    on<StopGenerationEvent>((event, emit) {
+      _isCancelled = true;
     });
   }
 
@@ -70,25 +74,53 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     _lastChatEvent = event;
+
     if (event.message.trim().isEmpty) {
       emit(ChatError(message: "Please enter a message."));
       return;
     }
+
     try {
+      _isCancelled = false;
+
       final userMessage = MessageModel(
         msg: event.message,
         isUser: true,
         createdAt: DateTime.now(),
       );
+
+      if (state is ChatLoaded) {
+        final current = state as ChatLoaded;
+
+        // 1️⃣ Emit user message with typing = true
+        emit(
+          current.copyWith(
+            messages: [...current.messages, userMessage],
+            isTyping: true,
+          ),
+        );
+      }
+
+      // 2️⃣ Call Gemini API
+      String? botReplyText;
+      try {
+        botReplyText = await chatRepository.sendMessageToGemini(event.message);
+      } catch (_) {}
+
+      if (_isCancelled) return;
+
       final botReply = MessageModel(
-        msg: await chatRepository.sendMessageToGemini(event.message),
+        msg: botReplyText ?? "Response cancelled.",
         isUser: false,
         createdAt: DateTime.now(),
       );
+
+      // Save logic (same as yours)
       _currentChatId ??= const Uuid().v4();
       final alreadyExists = _currentUser!.chatHistory.any(
         (chat) => chat.chatId == _currentChatId,
       );
+
       if (!alreadyExists) {
         final newChat = ChatModel(
           chatId: _currentChatId!,
@@ -100,12 +132,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           chatHistory: [..._currentUser!.chatHistory, newChat],
         );
       }
+
       if (_currentUser != null && _currentUser!.isFirstTime) {
         await chatRepository.updateIsFirstTime(false);
         _currentUser = _currentUser!.copyWith(isFirstTime: false);
       }
+
       await chatRepository.saveMessage(_currentChatId!, userMessage);
       await chatRepository.saveMessage(_currentChatId!, botReply);
+
       if (_currentUser != null) {
         final index = _currentUser!.chatHistory.indexWhere(
           (chat) => chat.chatId == _currentChatId,
@@ -121,11 +156,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           await chatRepository.updateChatHistory(_currentUser!.chatHistory);
         }
       }
+
+      // 3️⃣ Final emit: Add botReply, and isTyping = false
       if (state is ChatLoaded) {
         final current = state as ChatLoaded;
+
         emit(
           current.copyWith(
-            messages: [...current.messages, userMessage, botReply],
+            messages: [...current.messages, botReply],
+            isTyping: false,
             chatHistory: _currentUser!.chatHistory,
             selectedChatId: _currentChatId,
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemnichat_app/features/chat/bloc/chat_bloc.dart';
 import 'package:gemnichat_app/features/chat/bloc/chat_event.dart';
+import 'package:gemnichat_app/features/chat/bloc/chat_state.dart';
 
 class ChatTypingBox extends StatefulWidget {
   final TextEditingController controller;
@@ -40,8 +41,12 @@ class _ChatTypingBoxState extends State<ChatTypingBox> {
         SendMessageEvent(chatId: widget.chatId, message: text),
       );
       widget.controller.clear();
-      FocusScope.of(context).unfocus(); 
+      FocusScope.of(context).unfocus();
     }
+  }
+
+  void _handleStop(BuildContext context) {
+    context.read<ChatBloc>().add(StopGenerationEvent());
   }
 
   @override
@@ -51,62 +56,69 @@ class _ChatTypingBoxState extends State<ChatTypingBox> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF2C2C2C) : Colors.grey[200],
-            borderRadius: BorderRadius.circular(28),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: widget.controller,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: "Ask anything",
-                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.only(left: 10, top: 5),
-                ),
-                onSubmitted: (_) => _handleSend(context),
+        child: BlocBuilder<ChatBloc, ChatState>(
+          builder: (context, state) {
+            final isLoading = state is ChatLoading;
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF2C2C2C) : Colors.grey[200],
+                borderRadius: BorderRadius.circular(28),
               ),
-              const SizedBox(height: 8),
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.add, color: isDark ? Colors.white : Colors.black, size: 22),
-                  const SizedBox(width: 16),
-                  Icon(Icons.tune, color: isDark ? Colors.white : Colors.black, size: 20),
-                  const SizedBox(width: 4),
-                  Text(
-                    "Tools",
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
-                  ),
-                  const Spacer(),
-                  Icon(Icons.mic_none, color: isDark ? Colors.white : Colors.black, size: 22),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: () => _handleSend(context),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isTyping ? Colors.black : Colors.grey,
-                      ),
-                      child: Icon(
-                        isTyping ? Icons.arrow_upward_rounded : Icons.graphic_eq,
-                        color: Colors.white,
-                        size: 18,
-                      ),
+                  TextField(
+                    controller: widget.controller,
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                    maxLines: null, // 👈 This allows multi-line
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration(
+                      hintText: "Ask anything",
+                      hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.only(left: 10, top: 5),
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.add, color: isDark ? Colors.white : Colors.black, size: 22),
+                      const SizedBox(width: 16),
+                      Icon(Icons.tune, color: isDark ? Colors.white : Colors.black, size: 20),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Tools",
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 14),
+                      ),
+                      const Spacer(),
+                      Icon(Icons.mic_none, color: isDark ? Colors.white : Colors.black, size: 22),
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () => isLoading ? _handleStop(context) : _handleSend(context),
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isTyping || isLoading ? Colors.black : Colors.grey,
+                          ),
+                          child: Icon(
+                            isLoading ? Icons.stop : Icons.arrow_upward_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

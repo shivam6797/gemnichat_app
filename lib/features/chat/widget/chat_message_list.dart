@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemnichat_app/features/chat/bloc/chat_bloc.dart';
 import 'package:gemnichat_app/features/chat/bloc/chat_state.dart';
 import 'package:gemnichat_app/features/chat/widget/message_bubble.dart';
+import 'package:gemnichat_app/features/chat/widget/typing_indicator.dart';
 
 class ChatMessageList extends StatefulWidget {
   const ChatMessageList({super.key});
@@ -11,28 +12,27 @@ class ChatMessageList extends StatefulWidget {
   State<ChatMessageList> createState() => _ChatMessageListState();
 }
 
-class _ChatMessageListState extends State<ChatMessageList> with WidgetsBindingObserver{
+class _ChatMessageListState extends State<ChatMessageList>
+    with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
+  int _previousMessageCount = 0;
 
   @override
   void initState() {
     super.initState();
-     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-     WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     super.dispose();
   }
 
-   @override
+  @override
   void didChangeMetrics() {
-    // Called when keyboard opens/closes
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _scrollToBottom();
-    });
+    Future.delayed(const Duration(milliseconds: 200), _scrollToBottom);
   }
 
   void _scrollToBottom() {
@@ -56,33 +56,42 @@ class _ChatMessageListState extends State<ChatMessageList> with WidgetsBindingOb
         if (state is ChatLoaded) {
           final messages = state.messages;
 
-          // Auto-scroll after frame renders
-          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (messages.length > _previousMessageCount) {
+              _scrollToBottom();
+            }
+            _previousMessageCount = messages.length;
+          });
 
-          // Dummy message
           if (messages.length == 1 && !messages[0].isUser) {
             return Center(
               child: Text(
                 messages[0].msg,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey,
-                    ),
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
                 textAlign: TextAlign.center,
               ),
             );
           }
-
-          // Chat message list
           return ListView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.only(bottom: 140, top: 24),
-            itemCount: messages.length,
+            itemCount: messages.length + (state.isTyping ? 1 : 0),
             itemBuilder: (context, index) {
+              if (index == messages.length && state.isTyping) {
+                return const TypingIndicator();
+              }
+
               final m = messages[index];
-              return ChatMessageBubble(
-                message: m.msg,
-                isUser: m.isUser,
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: ChatMessageBubble(
+                  key: ValueKey('${m.isUser}-${m.createdAt}'),
+                  message: m.msg,
+                  isUser: m.isUser,
+                ),
               );
             },
           );

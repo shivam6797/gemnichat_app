@@ -32,3 +32,6 @@ class DeleteChatEvent extends ChatEvent {
 }
 
 class RetryLastEvent extends ChatEvent {}
+
+class StopGenerationEvent extends ChatEvent {}
+

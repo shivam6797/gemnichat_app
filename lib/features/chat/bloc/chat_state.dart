@@ -13,26 +13,28 @@ class ChatError extends ChatState {
   ChatError({required this.message});
 }
 
-// ✅ SINGLE STATE with everything
 class ChatLoaded extends ChatState {
   final UserModel user;
   final List<ChatModel> chatHistory;
   final List<MessageModel> messages;
+  final bool isTyping;
   final String? selectedChatId;
-   final bool hasStartedChat; // ✅ ADD THIS
+   final bool hasStartedChat;
 
   ChatLoaded({
     required this.user,
     required this.chatHistory,
     required this.messages,
+   this.isTyping = false,
     this.selectedChatId,
-     this.hasStartedChat = false, // ✅ DEFAULT FALSE
+     this.hasStartedChat = false,
   });
 
   ChatLoaded copyWith({
     UserModel? user,
     List<ChatModel>? chatHistory,
     List<MessageModel>? messages,
+    bool? isTyping,
     String? selectedChatId,
      bool? hasStartedChat,
   }) {
@@ -40,6 +42,7 @@ class ChatLoaded extends ChatState {
       user: user ?? this.user,
       chatHistory: chatHistory ?? this.chatHistory,
       messages: messages ?? this.messages,
+        isTyping: isTyping ?? this.isTyping,
       selectedChatId: selectedChatId ?? this.selectedChatId,
        hasStartedChat: hasStartedChat ?? this.hasStartedChat,
     );
