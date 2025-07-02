@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
           if (state is Authenticated ||
               state is Unauthenticated ||
               state is AuthFailure) {
-            // _navigateAfterDelay(state);
+            _navigateAfterDelay(state);
           }
         },
         child: Center(
