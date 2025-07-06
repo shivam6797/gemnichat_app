@@ -37,11 +37,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(Unauthenticated());
       }
     } catch (e) {
-      if (e is FirebaseAuthException) {
-        emit(AuthFailure(AppException.fromFirebaseAuth(e.code).message));
+      String message = "Something went wrong";
+      if (e is AppException) {
+        message = e.message;
       } else {
-        emit(AuthFailure(AppException("Something went wrong").message));
+        print("Unknown Sign-in Error: $e");
       }
+      emit(AuthFailure(message));
       emit(Unauthenticated());
     }
   }

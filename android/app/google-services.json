@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "915353570557-6sj7htuucrm5p9qr1upkk99p726090o7.apps.googleusercontent.com",
+          "client_id": "915353570557-38he2j9omkbrkthu1mt0v5surfbnh0ke.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.gemnichat_app",
-            "certificate_hash": "84e17c166064b73c005d907fdef487b452506d1b"
+            "certificate_hash": "ee942bc94935744cbd1d1e627994f8b43968751a"
           }
         },
         {

@@ -32,7 +32,9 @@ class AuthRepository {
       return user;
     } on FirebaseAuthException catch (e) {
       throw AppException.fromFirebaseAuth(e.code);
-    } catch (e) {
+    } catch (e, stack) {
+      print("Google Sign-In failed: $e");
+      print("Stack trace: $stack");
       throw AppException("Google Sign-in failed");
     }
   }
